@@ -1,84 +1,92 @@
-import React from 'react';
-import { View, Text, StyleSheet, SafeAreaView, FlatList, TouchableOpacity } from 'react-native';
-import { Play, MoveVertical as MoreVertical } from 'lucide-react-native';
-import BackHeader from '@/components/BackHeader';
-import OverflowMenu from '@/components/OverflowMenu';
-import { usePlayer } from '@/contexts/PlayerContext';
-import TrackRow from '@/components/TrackRow';
+import React from "react";
+import { View, Text, StyleSheet, SafeAreaView, FlatList } from "react-native";
+import BackHeader from "@/components/BackHeader";
+import OverflowMenu from "@/components/OverflowMenu";
+import { usePlayer } from "@/contexts/PlayerContext";
+import TrackRow from "@/components/TrackRow";
 
-const SONGS = [
-  'Goedemorgen Zonnestraal',
-  'Handjes Wassen Lied',
-  'Smakelijk Eten Samen',
-  'In de Kring',
-  'Opruimen Maar!',
-  'Hupsakee, Naar Buiten!',
-  'Alle Kleuren van de Dag',
+const ALL_SERVER_TRACKS = [
+  {
+    title: "example 1",
+    url: "https://aapscm.onllyons.com/muziek-song/1.mp3",
+  },
+  {
+    title: "example 2",
+    url: "https://aapscm.onllyons.com/muziek-song/2.mp3",
+  },
+  {
+    title: "example 3",
+    url: "https://aapscm.onllyons.com/muziek-song/3.mp3",
+  },
+  {
+    title: "example 4",
+    url: "https://aapscm.onllyons.com/muziek-song/4.mp3",
+  },
+  {
+    title: "example 5",
+    url: "https://aapscm.onllyons.com/muziek-song/5.mp3",
+  },
 ];
 
 export default function CategoryListScreen() {
   const { setCurrentTrack } = usePlayer();
+  const TRACKS = ALL_SERVER_TRACKS.slice(0, 4);
   const [overflowMenu, setOverflowMenu] = React.useState<{
     visible: boolean;
     songTitle: string;
     position: { x: number; y: number };
   }>({
     visible: false,
-    songTitle: '',
+    songTitle: "",
     position: { x: 0, y: 0 },
   });
 
-  const handleSongPress = (song: string) => {
-    console.log('Song pressed:', song);
-    // Set current track to show PlayerView
+  const handleSongPress = (title: string) => {
+    const t = TRACKS.find((x) => x.title === title);
     setCurrentTrack({
-      title: song,
-      coverUrl: 'https://aapscm.onllyons.com/muziek/player.png'
+      title,
+      audioUrl: t?.url, // păstrăm pentru viitor (chiar dacă acum e UI-only)
+      coverUrl: "https://aapscm.onllyons.com/muziek/player.png", // sau cover local cu require(...)
     });
   };
 
-  const handleOverflowPress = (song: string, event: any) => {
-    const { pageY } = event.nativeEvent;
-    setOverflowMenu({
-      visible: true,
-      songTitle: song,
-      position: { x: 0, y: pageY },
-    });
+  const handleOverflowPress = (
+    song: string,
+    anchor: { x: number; y: number }
+  ) => {
+    setOverflowMenu({ visible: true, songTitle: song, position: anchor });
   };
 
   const closeOverflowMenu = () => {
-    setOverflowMenu(prev => ({ ...prev, visible: false }));
+    setOverflowMenu((prev) => ({ ...prev, visible: false }));
   };
-
-
 
   return (
     <SafeAreaView style={styles.container}>
       <BackHeader />
-      
+
       {/* Sticky colored strip */}
       <View style={styles.categoryHeader}>
         <Text style={styles.categoryTitle}>Overgang</Text>
       </View>
 
       <FlatList
-        data={SONGS}
-        keyExtractor={(item, i) => `${item}-${i}`}
+        data={TRACKS}
+        keyExtractor={(item, i) => `${item.title}-${i}`}
         contentContainerStyle={styles.listContent}
         renderItem={({ item }) => (
           <TrackRow
-            title={item}
+            title={item.title}
             onPress={handleSongPress}
             onOverflowPress={handleOverflowPress}
           />
         )}
-        showsVerticalScrollIndicator={false}
       />
-      
+
       <OverflowMenu
         songTitle={overflowMenu.songTitle}
         visible={overflowMenu.visible}
-        onClose={() => setOverflowMenu(v => ({ ...v, visible: false }))}
+        onClose={() => setOverflowMenu((v) => ({ ...v, visible: false }))}
         anchorPosition={overflowMenu.position}
       />
     </SafeAreaView>
@@ -88,27 +96,22 @@ export default function CategoryListScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FEF7F5',
+    backgroundColor: "#FEF7F5",
   },
   categoryHeader: {
-    backgroundColor: '#ffe36e',
+    backgroundColor: "#ffe36e",
     paddingVertical: 16,
     paddingHorizontal: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#ffcd6e',
+    borderBottomColor: "#ffcd6e",
   },
   categoryTitle: {
     fontSize: 20,
-    fontWeight: 'bold',
-    color: '#534F50',
-    textAlign: 'center',
-  },
-  list: {
-    flex: 1,
+    fontWeight: "bold",
+    color: "#534F50",
+    textAlign: "center",
   },
   listContent: {
     paddingVertical: 8,
   },
-
-
 });

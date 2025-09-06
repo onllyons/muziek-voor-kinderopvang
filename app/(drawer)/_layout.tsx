@@ -1,4 +1,3 @@
-// app/(drawer)/_layout.tsx
 import React from 'react';
 import { Drawer } from 'expo-router/drawer';
 import { DrawerToggleButton } from '@react-navigation/drawer';

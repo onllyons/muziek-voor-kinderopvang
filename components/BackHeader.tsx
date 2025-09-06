@@ -34,7 +34,7 @@ const styles = StyleSheet.create({
   backButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    minHeight: 44, // 44pt hit target
+    minHeight: 44,
     paddingVertical: 10,
   },
   backText: {

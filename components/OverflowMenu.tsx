@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    minHeight: 44, // 44pt hit target
+    minHeight: 44,
   },
   menuText: {
     fontSize: 16,

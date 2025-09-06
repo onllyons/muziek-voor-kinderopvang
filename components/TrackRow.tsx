@@ -1,6 +1,12 @@
-import React, { memo } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, GestureResponderEvent } from 'react-native';
-import { Play, MoveVertical as MoreVertical } from 'lucide-react-native';
+import React, { memo } from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  GestureResponderEvent, 
+} from "react-native";
+import { Play, MoveVertical as MoreVertical } from "lucide-react-native";
 
 type Props = {
   title: string;
@@ -25,7 +31,9 @@ function TrackRowBase({ title, onPress, onOverflowPress }: Props) {
         <View style={s.playBtn}>
           <Play size={20} color="#666" fill="#666" />
         </View>
-        <Text style={s.title} numberOfLines={1}>{title}</Text>
+        <Text style={s.title} numberOfLines={1}>
+          {title}
+        </Text>
       </TouchableOpacity>
 
       <TouchableOpacity
@@ -44,9 +52,30 @@ function TrackRowBase({ title, onPress, onOverflowPress }: Props) {
 export default memo(TrackRowBase);
 
 const s = StyleSheet.create({
-  row: { flexDirection: 'row', alignItems: 'center', paddingVertical: 16, paddingHorizontal: 20, minHeight: 64 },
-  main: { flexDirection: 'row', alignItems: 'center', flex: 1, minHeight: 44 },
-  playBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: '#F5F5F5', alignItems: 'center', justifyContent: 'center', marginRight: 16 },
-  title: { flex: 1, fontSize: 16, color: '#333', fontWeight: '500' },
-  more: { padding: 12, marginLeft: 8, minWidth: 44, minHeight: 44, alignItems: 'center', justifyContent: 'center' },
+  row: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    minHeight: 64,
+  },
+  main: { flexDirection: "row", alignItems: "center", flex: 1, minHeight: 44 },
+  playBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: "#F5F5F5",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 16,
+  },
+  title: { flex: 1, fontSize: 16, color: "#333", fontWeight: "500" },
+  more: {
+    padding: 12,
+    marginLeft: 8,
+    minWidth: 44,
+    minHeight: 44,
+    alignItems: "center",
+    justifyContent: "center",
+  },
 });
