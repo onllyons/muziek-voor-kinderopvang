@@ -12,7 +12,7 @@ import { usePlayer } from '@/contexts/PlayerContext';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 const MINI_PLAYER_HEIGHT = 80;
-const EXPANDED_HEIGHT = SCREEN_HEIGHT * 0.9;
+const EXPANDED_HEIGHT = SCREEN_HEIGHT * 0.13;
 
 export default function PlayerView() {
   const { currentTrack, isExpanded, expandPlayer, collapsePlayer } = usePlayer();
@@ -295,24 +295,19 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     height: EXPANDED_HEIGHT,
-  },
-  // Mini Player Styles
-  miniPlayer: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -6 },
+    shadowOpacity: 0.12,
+    shadowRadius: 12,
+    elevation: 12,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
+  },
+  miniPlayer: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
     padding: 12,
-    margin: 16,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-    height: MINI_PLAYER_HEIGHT - 32,
   },
   miniPlayerMain: {
     flexDirection: 'row',

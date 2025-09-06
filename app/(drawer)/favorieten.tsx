@@ -12,7 +12,7 @@ export default function FavorietenScreen() {
     // Set current track to show PlayerView
     setCurrentTrack({
       title: song,
-      coverUrl: 'https://images.pexels.com/photos/1105666/pexels-photo-1105666.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&dpr=2'
+      coverUrl: 'https://aapscm.onllyons.com/muziek/player.png'
     });
   };
 
