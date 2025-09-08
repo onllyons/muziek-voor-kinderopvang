@@ -29,7 +29,7 @@ function TrackRowBase({ title, onPress, onOverflowPress }: Props) {
         accessibilityLabel={`Speel ${title}`}
       >
         <View style={s.playBtn}>
-          <Play size={20} color="#666" fill="#666" />
+          <Play size={35} color="#666" fill="#666" />
         </View>
         <Text style={s.title} numberOfLines={1}>
           {title}
@@ -63,8 +63,6 @@ const s = StyleSheet.create({
   playBtn: {
     width: 44,
     height: 44,
-    borderRadius: 22,
-    backgroundColor: "#F5F5F5",
     alignItems: "center",
     justifyContent: "center",
     marginRight: 16,

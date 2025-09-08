@@ -27,8 +27,9 @@ export default function BackHeader() {
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 20,
-    paddingVertical: 15,
+    paddingHorizontal: 10,
+    paddingTop: 10,
+    paddingBottom: 25,
     backgroundColor: '#FEF7F5',
   },
   backButton: {

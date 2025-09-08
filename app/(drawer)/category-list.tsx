@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, SafeAreaView, FlatList } from "react-native";
+import { View, Text, StyleSheet, SafeAreaView, FlatList, Platform } from "react-native";
 import BackHeader from "@/components/BackHeader";
 import OverflowMenu from "@/components/OverflowMenu";
 import { usePlayer } from "@/contexts/PlayerContext";
@@ -45,8 +45,8 @@ export default function CategoryListScreen() {
     const t = TRACKS.find((x) => x.title === title);
     setCurrentTrack({
       title,
-      audioUrl: t?.url, // păstrăm pentru viitor (chiar dacă acum e UI-only)
-      coverUrl: "https://aapscm.onllyons.com/muziek/player.png", // sau cover local cu require(...)
+      audioUrl: t?.url,
+      coverUrl: "https://aapscm.onllyons.com/muziek/player.png",
     });
   };
 
@@ -65,7 +65,6 @@ export default function CategoryListScreen() {
     <SafeAreaView style={styles.container}>
       <BackHeader />
 
-      {/* Sticky colored strip */}
       <View style={styles.categoryHeader}>
         <Text style={styles.categoryTitle}>Overgang</Text>
       </View>
@@ -102,8 +101,15 @@ const styles = StyleSheet.create({
     backgroundColor: "#ffe36e",
     paddingVertical: 16,
     paddingHorizontal: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ffcd6e",
+    shadowColor: "#000",
+    shadowOpacity: 0.18,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 4 },
+    ...Platform.select({
+      android: {
+        elevation: 4,
+      },
+    }),
   },
   categoryTitle: {
     fontSize: 20,
