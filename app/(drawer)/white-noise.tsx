@@ -1,6 +1,7 @@
 import React from 'react';
-import { View, Text, StyleSheet, SafeAreaView, FlatList } from 'react-native';
+import { View, Text, Platform, StyleSheet, SafeAreaView, FlatList } from 'react-native';
 import BackHeader from '@/components/BackHeader';
+import { LinearGradient } from 'expo-linear-gradient';
 import OverflowMenu from '@/components/OverflowMenu';
 import { usePlayer } from '@/contexts/PlayerContext';
 import TrackRow from '@/components/TrackRow';
@@ -33,7 +34,14 @@ export default function WhiteNoiseScreen() {
       <BackHeader />
 
       <View style={styles.categoryHeader}>
-        <Text style={styles.categoryTitle}>Witte Ruis</Text>
+        <LinearGradient
+          colors={['#F4EFFA', '#D8C3F4']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={styles.categoryGradient}
+        >
+          <Text style={styles.categoryTitle}>Witte Ruis</Text>
+        </LinearGradient>
       </View>
 
       <FlatList
@@ -63,12 +71,22 @@ export default function WhiteNoiseScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#FEF7F5' },
   categoryHeader: {
-    backgroundColor: '#e4dcfd',
+    shadowColor: "#000",
+    shadowOpacity: 0.18,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 4 },
+    ...Platform.select({ android: { elevation: 4 } }),
+  },
+  categoryGradient:{
+    width: '100%',
     paddingVertical: 16,
     paddingHorizontal: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#d2c4fa',
   },
-  categoryTitle: { fontSize: 20, fontWeight: 'bold', color: '#534F50', textAlign: 'center' },
+  categoryTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#534F50",
+    textAlign: "center",
+  },
   listContent: { paddingVertical: 8 },
 });

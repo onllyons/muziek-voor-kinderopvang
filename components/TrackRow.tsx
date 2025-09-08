@@ -1,20 +1,37 @@
+// components/TrackRow.tsx
 import React, { memo } from "react";
 import {
   View,
   Text,
   TouchableOpacity,
   StyleSheet,
-  GestureResponderEvent, 
+  GestureResponderEvent,
 } from "react-native";
-import { Play, MoveVertical as MoreVertical } from "lucide-react-native";
+import { Play, Pause, MoreVertical } from "lucide-react-native";
+import { usePlayer } from "@/contexts/PlayerContext";
 
 type Props = {
   title: string;
-  onPress: (title: string) => void;
+  url: string;
+  coverUrl: string | number;
   onOverflowPress: (title: string, anchor: { x: number; y: number }) => void;
+  onPlay: () => void; // nou: pornește playback din listă
 };
 
-function TrackRowBase({ title, onPress, onOverflowPress }: Props) {
+function TrackRowBase({ title, url, coverUrl, onOverflowPress, onPlay }: Props) {
+  const { currentTrack, isPlaying, togglePlay } = usePlayer();
+  const isCurrent = currentTrack?.title === title;
+
+  const handleRowPress = async () => {
+    if (isCurrent) {
+      await togglePlay();
+    } else {
+      onPlay();
+    }
+  };
+
+  const handlePlayIconPress = handleRowPress;
+
   const handleOverflow = (e: GestureResponderEvent) => {
     const { pageX, pageY } = e.nativeEvent;
     onOverflowPress(title, { x: pageX, y: pageY });
@@ -24,13 +41,22 @@ function TrackRowBase({ title, onPress, onOverflowPress }: Props) {
     <View style={s.row}>
       <TouchableOpacity
         style={s.main}
-        onPress={() => onPress(title)}
+        onPress={handleRowPress}
         accessibilityRole="button"
         accessibilityLabel={`Speel ${title}`}
+        activeOpacity={0.8}
       >
-        <View style={s.playBtn}>
-          <Play size={35} color="#666" fill="#666" />
-        </View>
+        <TouchableOpacity
+          style={s.playBtn}
+          onPress={handlePlayIconPress}
+          activeOpacity={0.8}
+        >
+          {isCurrent && isPlaying ? (
+            <Pause size={33} color="#534F50" fill="#534F50" />
+          ) : (
+            <Play size={33} color="#534F50" fill="#534F50" />
+          )}
+        </TouchableOpacity>
         <Text style={s.title} numberOfLines={1}>
           {title}
         </Text>
@@ -43,7 +69,7 @@ function TrackRowBase({ title, onPress, onOverflowPress }: Props) {
         accessibilityLabel={`Meer opties voor ${title}`}
         hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
       >
-        <MoreVertical size={20} color="#666" />
+        <MoreVertical size={20} color="#534F50" />
       </TouchableOpacity>
     </View>
   );
@@ -59,15 +85,25 @@ const s = StyleSheet.create({
     paddingHorizontal: 20,
     minHeight: 64,
   },
-  main: { flexDirection: "row", alignItems: "center", flex: 1, minHeight: 44 },
+  main: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
+    minHeight: 44,
+  },
   playBtn: {
     width: 44,
     height: 44,
     alignItems: "center",
     justifyContent: "center",
-    marginRight: 16,
+    marginRight: 40,
   },
-  title: { flex: 1, fontSize: 16, color: "#333", fontWeight: "500" },
+  title: {
+    flex: 1,
+    fontSize: 16,
+    color: "#1E1E1E",
+    fontWeight: "500",
+  },
   more: {
     padding: 12,
     marginLeft: 8,

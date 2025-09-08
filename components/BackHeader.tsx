@@ -3,11 +3,19 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { ChevronLeft } from 'lucide-react-native';
 
-export default function BackHeader() {
+type Props = {
+  onBack?: () => void;
+};
+
+export default function BackHeader({ onBack }: Props) {
   const router = useRouter();
 
   const handleBack = () => {
-    router.back();
+    if (onBack) {
+      onBack();
+    } else {
+      router.back();
+    }
   };
 
   return (

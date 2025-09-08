@@ -1,7 +1,8 @@
 import React from 'react';
-import { View, Text, StyleSheet, SafeAreaView, FlatList, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView, Platform, FlatList, TouchableOpacity, Image } from 'react-native';
 import { Play, MoveVertical as MoreVertical, Heart } from 'lucide-react-native';
 import BackHeader from '@/components/BackHeader';
+import { LinearGradient } from 'expo-linear-gradient';
 import { usePlayer } from '@/contexts/PlayerContext';
 
 export default function FavorietenScreen() {
@@ -47,7 +48,7 @@ export default function FavorietenScreen() {
   const renderEmptyState = () => (
     <View style={styles.emptyContainer}>
       <View style={styles.illustrationContainer}>
-        <Heart size={80} color="#E0E0E0" />
+        <Heart size={80} color="#e0e0e0" />
       </View>
       <Text style={styles.emptyTitle}>Nog geen favorieten</Text>
       <Text style={styles.emptySubtitle}>
@@ -60,9 +61,15 @@ export default function FavorietenScreen() {
     <SafeAreaView style={styles.container}>
       <BackHeader />
       
-      {/* Sticky colored strip */}
       <View style={styles.categoryHeader}>
-        <Text style={styles.categoryTitle}>Favorieten</Text>
+        <LinearGradient
+          colors={['#ffa3a3', '#ff6868']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={styles.categoryGradient}
+        >
+          <Text style={styles.categoryTitle}>Favorieten</Text>
+        </LinearGradient>
       </View>
 
       {favorites.length === 0 ? (
@@ -86,18 +93,24 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#FEF7F5',
   },
+
   categoryHeader: {
-    backgroundColor: '#f89c9c',
+    shadowColor: "#000",
+    shadowOpacity: 0.18,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 4 },
+    ...Platform.select({ android: { elevation: 4 } }),
+  },
+  categoryGradient:{
+    width: '100%',
     paddingVertical: 16,
     paddingHorizontal: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e77b7b',
   },
   categoryTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#534F50',
-    textAlign: 'center',
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#534F50",
+    textAlign: "center",
   },
   list: {
     flex: 1,
@@ -163,7 +176,7 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#ffffff',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 24,

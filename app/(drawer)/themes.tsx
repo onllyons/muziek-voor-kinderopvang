@@ -1,118 +1,165 @@
+// app/.../ThemesScreen.tsx
 import React from 'react';
-import { View, Text, StyleSheet, SafeAreaView, FlatList, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  SafeAreaView,
+  FlatList,
+  TouchableOpacity,
+  Platform,
+} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import BackHeader from '@/components/BackHeader';
 import { usePlayer } from '@/contexts/PlayerContext';
 
-const THEMES = [
+type ThemeKey =
+  | 'Vrolijk'
+  | 'Herfst'
+  | 'Sinterklaas'
+  | 'Dieren'
+  | 'Rustig'
+  | 'Eten';
+
+const THEMES: ThemeKey[] = [
   'Vrolijk',
-  'Herfst', 
+  'Herfst',
   'Sinterklaas',
   'Dieren',
   'Rustig',
-  'Eten'
+  'Eten',
 ];
 
-export default function ThemesScreen() {
-  const { setFilter, currentFilter } = usePlayer();
+const THEME_GRADIENTS: Record<ThemeKey, [string, string]> = {
+  Vrolijk: ['#FFA6F0', '#D45DFF'],
+  Herfst: ['#EAC286', '#BC8B4F'],
+  Sinterklaas: ['#FF8F8F', '#FF5050'],
+  Dieren: ['#F5F8B0', '#EEDE67'],
+  Rustig: ['#A6D3FF', '#795EFF'],
+  Eten: ['#9CFFEF', '#4F9DBC'],
 
-  const handleThemePress = (theme: string) => {
-    console.log('Theme pressed:', theme);
-    // Set filter in player context
+};
+
+export default function ThemesScreen() {
+  const { setFilter } = usePlayer();
+
+  const handleThemePress = (theme: ThemeKey) => {
     setFilter(theme);
   };
 
-  const renderThemeItem = ({ item }: { item: string }) => (
-    <TouchableOpacity 
-      style={styles.pillWrapper}
-      onPress={() => handleThemePress(item)}
-    >
-      <LinearGradient
-        colors={['#a8e6cf', '#88d8a3']}
-        style={styles.pill}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
+  const renderThemeItem = ({ item }: { item: ThemeKey }) => {
+    const colors = THEME_GRADIENTS[item];
+
+    return (
+      <TouchableOpacity
+        style={styles.pillWrapper}
+        onPress={() => handleThemePress(item)}
+        activeOpacity={0.85}
+        accessibilityRole="button"
+        accessibilityLabel={`Alege tema ${item}`}
       >
-        <Text style={styles.pillText}>{item}</Text>
-      </LinearGradient>
-    </TouchableOpacity>
-  );
+        <LinearGradient
+          colors={colors}
+          start={{ x: 0, y: 0.1 }}
+          end={{ x: 1, y: 0.9 }}
+          style={styles.pill}
+        >
+          <Text style={styles.pillText}>{item}</Text>
+        </LinearGradient>
+      </TouchableOpacity>
+    );
+  };
 
   return (
     <SafeAreaView style={styles.container}>
       <BackHeader />
-      
-      {/* Sticky colored strip */}
+
       <View style={styles.categoryHeader}>
-        <Text style={styles.categoryTitle}>Thema's</Text>
+        <LinearGradient
+          colors={['#86EABA', '#4FBC80']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={styles.categoryGradient}
+        >
+          <Text style={styles.categoryTitle}>Overgang</Text>
+        </LinearGradient>
       </View>
 
       <FlatList
+        style={{ marginTop: 30 }}
         data={THEMES}
         renderItem={renderThemeItem}
         keyExtractor={(item, index) => `${item}-${index}`}
         numColumns={2}
-        style={styles.list}
         contentContainerStyle={styles.listContent}
-        showsVerticalScrollIndicator={false}
         columnWrapperStyle={styles.row}
+        showsVerticalScrollIndicator={false}
       />
     </SafeAreaView>
   );
 }
+
+const PILL_HEIGHT = 60;
+const PILL_RADIUS = 16;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#FEF7F5',
   },
+
   categoryHeader: {
-    backgroundColor: '#87e9b4',
+    shadowColor: "#000",
+    shadowOpacity: 0.18,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 4 },
+    ...Platform.select({ android: { elevation: 4 } }),
+  },
+  categoryGradient:{
+    width: '100%',
     paddingVertical: 16,
     paddingHorizontal: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#6fd7a6',
   },
   categoryTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#534F50',
-    textAlign: 'center',
-  },
-  list: {
-    flex: 1,
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#534F50",
+    textAlign: "center",
   },
   listContent: {
-    paddingVertical: 16,
-    paddingHorizontal: 16,
+    paddingHorizontal: 18,
+    paddingTop: 16,
+    paddingBottom: 30,
   },
   row: {
     justifyContent: 'space-between',
-    marginBottom: 12,
+    marginTop: 18,
   },
   pillWrapper: {
     flex: 1,
     marginHorizontal: 6,
+
+    shadowColor: "#000",
+    shadowOpacity: 0.18,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 4 },
+    ...Platform.select({ android: { elevation: 4 } }),
+
   },
   pill: {
-    paddingVertical: 16,
-    paddingHorizontal: 20,
-    borderRadius: 25,
-    alignItems: 'center',
+    height: PILL_HEIGHT,
+    borderRadius: PILL_RADIUS,
+    alignItems: 'center', 
     justifyContent: 'center',
     shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.12,
+    shadowRadius: 14,
+    ...Platform.select({ android: { elevation: 8 } }),
   },
   pillText: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '600',
     color: '#534F50',
-    textAlign: 'center',
   },
 });
