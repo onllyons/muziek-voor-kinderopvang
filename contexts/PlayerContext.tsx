@@ -20,7 +20,7 @@ type PlayerContextType = {
   uiIntendsToPlay: boolean;
   isExpanded: boolean;
   currentFilter: string | null;
-  favorites: string[];
+  favorites: Track[];
   playlist: Track[];
   currentIndex: number;
 
@@ -40,7 +40,7 @@ type PlayerContextType = {
   expandPlayer: () => void;
   collapsePlayer: () => void;
   setFilter: (filter: string | null) => void;
-  addToFavorites: (title: string) => void;
+  addToFavorites: (track: Track) => void;
   removeFromFavorites: (title: string) => void;
   isFavorite: (title: string) => boolean;
 };
@@ -56,7 +56,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
 
   const [isExpanded, setIsExpanded] = useState(false);
   const [currentFilter, setCurrentFilter] = useState<string | null>(null);
-  const [favorites, setFavorites] = useState<string[]>([]);
+  const [favorites, setFavorites] = useState<Track[]>([]);
   const [playlist, setPlaylist] = useState<Track[]>([]);
   const [currentIndex, setCurrentIndex] = useState<number>(-1);
 
@@ -89,11 +89,15 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   const expandPlayer = () => setIsExpanded(true);
   const collapsePlayer = () => setIsExpanded(false);
   const setFilter = (f: string | null) => setCurrentFilter(f);
-  const addToFavorites = (title: string) =>
-    setFavorites((p) => (p.includes(title) ? p : [...p, title]));
+  const addToFavorites = (track: Track) =>
+  setFavorites(prev =>
+    prev.some(t => t.title === track.title) ? prev : [...prev, track]
+  );
   const removeFromFavorites = (title: string) =>
-    setFavorites((p) => p.filter((t) => t !== title));
-  const isFavorite = (title: string) => favorites.includes(title);
+  setFavorites(prev => prev.filter(t => t.title !== title));
+
+  const isFavorite = (title: string) =>
+    favorites.some(t => t.title === title);
 
   async function playFromList(
     list: { title: string; url: string }[],
@@ -101,6 +105,14 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     coverUrl: string | number,
     opts: { autoExpand?: boolean } = {}
   ) {
+
+    const valid = list.filter(t => !!t.url);
+    if (valid.length === 0) {
+      console.warn('playFromList: no valid URLs');
+      setIntends(false);
+      return;
+    }
+  
     const tracks: Track[] = list.map((it) => ({
       title: it.title,
       audioUrl: it.url,

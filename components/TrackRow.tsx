@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React, { memo } from "react";
 import {
   View,
   Text,
@@ -6,19 +6,26 @@ import {
   GestureResponderEvent,
   Pressable,
   AccessibilityState,
-} from 'react-native';
-import { Play, Pause, MoreVertical } from 'lucide-react-native';
-import { usePlayer } from '@/contexts/PlayerContext';
+} from "react-native";
+import { Play, Pause, MoreVertical, Heart } from "lucide-react-native";
+import { usePlayer } from "@/contexts/PlayerContext";
 
 type Props = {
   title: string;
-  url: string;
-  coverUrl: string | number;
-  onOverflowPress: (title: string, anchor: { x: number; y: number }) => void;
+  coverUrl?: string | number;
+  url?: string;
   onPlay: () => void;
+
+  onOverflowPress?: (title: string, anchor: { x: number; y: number }) => void;
+  onRemoveFavorite?: (title: string) => void;
 };
 
-function TrackRowBase({ title, onOverflowPress, onPlay }: Props) {
+function TrackRowBase({
+  title,
+  onPlay,
+  onOverflowPress,
+  onRemoveFavorite,
+}: Props) {
   const { currentTrack, isPlaying, uiIntendsToPlay, togglePlay } = usePlayer();
   const isCurrent = currentTrack?.title === title;
 
@@ -28,8 +35,13 @@ function TrackRowBase({ title, onOverflowPress, onPlay }: Props) {
   };
 
   const handleOverflow = (e: GestureResponderEvent) => {
+    if (!onOverflowPress) return;
     const { pageX, pageY } = e.nativeEvent;
     onOverflowPress(title, { x: pageX, y: pageY });
+  };
+
+  const handleRemove = () => {
+    if (onRemoveFavorite) onRemoveFavorite(title);
   };
 
   const showPause = isCurrent && (isPlaying || uiIntendsToPlay);
@@ -46,7 +58,9 @@ function TrackRowBase({ title, onOverflowPress, onPlay }: Props) {
           style={({ pressed }) => [s.playBtn, pressed && s.pressedLight]}
           onPress={handlePlayPress}
           accessibilityRole="button"
-          accessibilityLabel={isCurrent ? (showPause ? 'Pauză' : 'Redă') : 'Redă'}
+          accessibilityLabel={
+            isCurrent ? (showPause ? "Pauză" : "Redă") : "Redă"
+          }
           accessibilityState={a11yState}
           hitSlop={8}
         >
@@ -62,15 +76,27 @@ function TrackRowBase({ title, onOverflowPress, onPlay }: Props) {
         </Text>
       </View>
 
-      <Pressable
-        style={({ pressed }) => [s.more, pressed && s.pressedLight]}
-        onPress={handleOverflow}
-        accessibilityRole="button"
-        accessibilityLabel={`Mai multe opțiuni pentru ${title}`}
-        hitSlop={8}
-      >
-        <MoreVertical size={20} color="#534F50" />
-      </Pressable>
+      {onRemoveFavorite ? (
+        <Pressable
+          style={({ pressed }) => [s.more, pressed && s.pressedLight]}
+          onPress={handleRemove}
+          accessibilityRole="button"
+          accessibilityLabel={`Remove ${title} din favorite`}
+          hitSlop={8}
+        >
+          <Heart size={20} color="#e77b7b" fill="#e77b7b" />
+        </Pressable>
+      ) : onOverflowPress ? (
+        <Pressable
+          style={({ pressed }) => [s.more, pressed && s.pressedLight]}
+          onPress={handleOverflow}
+          accessibilityRole="button"
+          accessibilityLabel={`Mai multe opțiuni pentru ${title}`}
+          hitSlop={8}
+        >
+          <MoreVertical size={20} color="#534F50" />
+        </Pressable>
+      ) : null}
     </View>
   );
 }
@@ -79,39 +105,39 @@ export default memo(TrackRowBase);
 
 const s = StyleSheet.create({
   row: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingVertical: 16,
     paddingHorizontal: 20,
     minHeight: 64,
   },
   main: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     flex: 1,
     minHeight: 44,
   },
   playBtn: {
     width: 44,
     height: 44,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     marginRight: 40,
     borderRadius: 22,
   },
   title: {
     flex: 1,
     fontSize: 16,
-    color: '#1E1E1E',
-    fontWeight: '500',
+    color: "#1E1E1E",
+    fontWeight: "500",
   },
   more: {
     padding: 12,
     marginLeft: 8,
     minWidth: 44,
     minHeight: 44,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     borderRadius: 22,
   },
   pressedLight: { opacity: 0.9 },

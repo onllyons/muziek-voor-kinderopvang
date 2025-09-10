@@ -16,14 +16,6 @@ import TrackRow from "@/components/TrackRow";
 import { LinearGradient } from "expo-linear-gradient";
 import { fetchTracks, ServerTrack } from "@/lib/queries";
 
-const ALL_SERVER_TRACKS: ServerTrack[] = [
-  { title: "example 1", url: "https://aapscm.onllyons.com/muziek-song/1.mp3" },
-  { title: "example 2", url: "https://aapscm.onllyons.com/muziek-song/2.mp3" },
-  { title: "example 3", url: "https://aapscm.onllyons.com/muziek-song/3.mp3" },
-  { title: "example 4", url: "https://aapscm.onllyons.com/muziek-song/4.mp3" },
-  { title: "example 5", url: "https://aapscm.onllyons.com/muziek-song/5.mp3" },
-];
-
 export default function CategoryListScreen() {
   const { playFromList } = usePlayer();
 
@@ -35,15 +27,24 @@ export default function CategoryListScreen() {
 
   const [overflowMenu, setOverflowMenu] = React.useState({
     visible: false,
-    songTitle: "",
+    track: null as null | {
+      title: string;
+      audioUrl?: string;
+      coverUrl: string | number;
+    },
     position: { x: 0, y: 0 },
   });
 
   const handleOverflowPress = (
-    song: string,
+    songTitle: string,
     anchor: { x: number; y: number }
   ) => {
-    setOverflowMenu({ visible: true, songTitle: song, position: anchor });
+    const item = tracks.find((t) => t.title === songTitle);
+    setOverflowMenu({
+      visible: true,
+      track: { title: songTitle, audioUrl: item?.url, coverUrl: COVER_URL },
+      position: anchor,
+    });
   };
 
   const load = React.useCallback(async () => {
@@ -98,11 +99,12 @@ export default function CategoryListScreen() {
           end={{ x: 1, y: 0 }}
           style={styles.categoryGradient}
         >
-          <Text style={styles.categoryTitle}>All songs</Text> 
+          <Text style={styles.categoryTitle}>All songs</Text>
         </LinearGradient>
       </View>
 
       {!!error && <Text style={{ color: "#B00020", margin: 12 }}>{error}</Text>}
+
       <FlatList
         data={tracks}
         keyExtractor={(item, i) => `${item.title}-${i}`}
@@ -121,13 +123,19 @@ export default function CategoryListScreen() {
             url={item.url}
             coverUrl={COVER_URL}
             onOverflowPress={handleOverflowPress}
-            onPlay={() => playFromList(tracks, index, COVER_URL)}
+            onPlay={() =>
+              playFromList(
+                tracks.map((t) => ({ title: t.title, url: t.url })),
+                index,
+                COVER_URL
+              )
+            }
           />
         )}
       />
 
       <OverflowMenu
-        songTitle={overflowMenu.songTitle}
+        track={overflowMenu.track}
         visible={overflowMenu.visible}
         onClose={() => setOverflowMenu((v) => ({ ...v, visible: false }))}
         anchorPosition={overflowMenu.position}

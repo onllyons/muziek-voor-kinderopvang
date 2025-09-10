@@ -259,7 +259,6 @@ export default function PlayerView() {
         accessible
         accessibilityLabel="Player audio"
       >
-        {/* MINI PLAYER */}
         {!isExpanded && (
           <View style={styles.miniPlayer}>
             <Pressable
@@ -333,7 +332,6 @@ export default function PlayerView() {
           </View>
         )}
 
-        {/* EXPANDED PLAYER */}
         <Animated.View style={styles.expandedPlayer}>
           <BackHeader onBack={collapsePlayer} />
           <View style={[styles.expandedPlayerCenter, expandedContentStyle]}>
