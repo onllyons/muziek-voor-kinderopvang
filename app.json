@@ -16,7 +16,8 @@
         "ITSAppUsesNonExemptEncryption": false,
         "NSCameraUsageDescription": "Deze app gebruikt de camera niet actief, maar bevat modules die cameratoegang kunnen aanvragen.",
         "NSPhotoLibraryUsageDescription": "Deze app gebruikt de fotobibliotheek niet actief, maar bevat modules die toegang kunnen aanvragen.",
-        "NSMicrophoneUsageDescription": "Deze app gebruikt de microfoon niet actief, maar bevat modules die toegang kunnen aanvragen."
+        "NSMicrophoneUsageDescription": "Deze app gebruikt de microfoon niet actief, maar bevat modules die toegang kunnen aanvragen.",
+        "UIBackgroundModes": ["audio"]
       }
     },
     "android": {

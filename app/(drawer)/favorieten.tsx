@@ -10,7 +10,6 @@ export default function FavorietenScreen() {
 
   const handleSongPress = (song: string) => {
     console.log('Favorite song pressed:', song);
-    // Set current track to show PlayerView
     setCurrentTrack({
       title: song,
       coverUrl: 'https://aapscm.onllyons.com/muziek/player.png'
@@ -135,7 +134,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 2,
     elevation: 2,
-    minHeight: 64, // Ensures 44pt+ hit target
+    minHeight: 64,
   },
   songMain: {
     flexDirection: 'row',
@@ -144,7 +143,7 @@ const styles = StyleSheet.create({
     minHeight: 44,
   },
   playIconContainer: {
-    width: 44, // 44pt hit target
+    width: 44,
     height: 44,
     borderRadius: 22,
     backgroundColor: '#F5F5F5',
@@ -159,7 +158,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   overflowContainer: {
-    padding: 12, // 44pt hit target with padding
+    padding: 12,
     marginLeft: 8,
     minWidth: 44,
     minHeight: 44,
