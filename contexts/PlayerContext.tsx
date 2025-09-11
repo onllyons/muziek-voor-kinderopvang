@@ -23,6 +23,7 @@ type PlayerContextType = {
   favorites: Track[];
   playlist: Track[];
   currentIndex: number;
+  setUiIntends: (val: boolean) => void;
 
   playFromList: (
     list: { title: string; url: string }[],
@@ -43,11 +44,17 @@ type PlayerContextType = {
   addToFavorites: (track: Track) => void;
   removeFromFavorites: (title: string) => void;
   isFavorite: (title: string) => boolean;
+  noteExternalSeek: (targetSec: number) => void;
 };
 
 const PlayerContext = createContext<PlayerContextType | undefined>(undefined);
 
 export function PlayerProvider({ children }: { children: ReactNode }) {
+  const DEBUG = __DEV__;
+  const log = (...args: any[]) => {
+    if (DEBUG) console.log(...args);
+  };
+
   const [currentTrack, setCurrentTrackState] = useState<Track | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
 
@@ -80,24 +87,34 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
 
   const suppressTrackChangeRef = useRef(false);
   const desiredIndexRef = useRef<number | null>(null);
+  const lastSeekAtRef = useRef(0);
+  const lastSeekTargetRef = useRef<number | null>(null);
+  function noteExternalSeek(targetSec: number) {
+    lastSeekAtRef.current = Date.now();
+    lastSeekTargetRef.current = targetSec;
+  }
 
   function setIntends(val: boolean) {
     intendsToPlayRef.current = val;
     setUiIntendsToPlay(val);
   }
 
+  function setUiIntends(val: boolean) {
+    setIntends(val);
+  }
+
   const expandPlayer = () => setIsExpanded(true);
   const collapsePlayer = () => setIsExpanded(false);
   const setFilter = (f: string | null) => setCurrentFilter(f);
   const addToFavorites = (track: Track) =>
-  setFavorites(prev =>
-    prev.some(t => t.title === track.title) ? prev : [...prev, track]
-  );
+    setFavorites((prev) =>
+      prev.some((t) => t.title === track.title) ? prev : [...prev, track]
+    );
   const removeFromFavorites = (title: string) =>
-  setFavorites(prev => prev.filter(t => t.title !== title));
+    setFavorites((prev) => prev.filter((t) => t.title !== title));
 
   const isFavorite = (title: string) =>
-    favorites.some(t => t.title === title);
+    favorites.some((t) => t.title === title);
 
   async function playFromList(
     list: { title: string; url: string }[],
@@ -105,19 +122,21 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     coverUrl: string | number,
     opts: { autoExpand?: boolean } = {}
   ) {
+    log("[PLAY_FROM_LIST] startIndex=", startIndex, "inputLen=", list.length);
 
-    const valid = list.filter(t => !!t.url);
+    const valid = list.filter((t) => !!t.url);
     if (valid.length === 0) {
-      console.warn('playFromList: no valid URLs');
+      console.warn("playFromList: no valid URLs");
       setIntends(false);
       return;
     }
-  
+
     const tracks: Track[] = list.map((it) => ({
       title: it.title,
       audioUrl: it.url,
       coverUrl,
     }));
+    log("[PLAY_FROM_LIST] tracksLen=", tracks.length);
 
     setPlaylist(tracks);
     setCurrentIndex(startIndex);
@@ -141,6 +160,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
         await TrackPlayer.skip(startIndex);
         await TrackPlayer.play();
         setIsExpanded(!!opts.autoExpand);
+        log("[PLAY_FROM_LIST] queued & playing at index", startIndex);
       } catch (e) {
         console.warn("playFromList error:", e);
         setIntends(false);
@@ -154,6 +174,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     track: Track | null,
     opts: { autoExpand?: boolean } = {}
   ) {
+    log("[SET_CURRENT_TRACK]", track?.title);
     if (!track?.audioUrl) {
       try {
         await TrackPlayer.reset();
@@ -195,6 +216,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   }
 
   async function togglePlay() {
+    log("[TOGGLE_PLAY]");
     const now = Date.now();
     if (now - lastToggleRef.current < 250) return;
     lastToggleRef.current = now;
@@ -216,6 +238,15 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
 
   async function skipTo(targetIndex: number) {
     const queueLen = playlistRef.current.length;
+    log(
+      "[SKIP_TO] targetIndex=",
+      targetIndex,
+      "queueLen=",
+      queueLen,
+      "currentIndex=",
+      currentIndex
+    );
+
     if (queueLen === 0) return;
     if (targetIndex < 0 || targetIndex >= queueLen) return;
 
@@ -239,12 +270,16 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   async function skipToNext() {
     const queueLen = playlistRef.current.length;
     const next = currentIndex + 1;
+    log("[SKIP_TO_NEXT] trying next=", next, "queueLen=", queueLen);
+
     if (queueLen === 0 || next >= queueLen) return;
     await skipTo(next);
   }
 
   async function skipToPrevious() {
     const queueLen = playlistRef.current.length;
+    log("[SKIP_TO_PREV] queueLen=", queueLen, "currentIndex=", currentIndex);
+
     if (queueLen === 0) return;
 
     try {
@@ -269,14 +304,52 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
           state === State.Buffering ||
           state === State.Connecting;
         setIsPlaying(playingLike);
+        log("[STATE]", state);
       }
     );
 
     const subTrack = TrackPlayer.addEventListener(
       Event.PlaybackTrackChanged,
-      ({ nextTrack }) => {
+      async ({ nextTrack, track }) => {
+        log("[TRACK_CHANGED] from", track, "to", nextTrack);
         if (typeof nextTrack !== "number" || nextTrack < 0) return;
 
+        const now = Date.now();
+        const SEEK_HOLD_MS = 900;
+        if (
+          lastSeekAtRef.current &&
+          now - lastSeekAtRef.current < SEEK_HOLD_MS
+        ) {
+          if (
+            !suppressTrackChangeRef.current &&
+            desiredIndexRef.current == null
+          ) {
+            log("[TRACK_CHANGED] suppressed auto-advance after seek");
+            try {
+              const currentIdx = currentIndex;
+              suppressTrackChangeRef.current = true;
+              desiredIndexRef.current = currentIdx;
+
+              await TrackPlayer.skip(currentIdx);
+
+              const dur = await TrackPlayer.getDuration?.();
+              if (dur && lastSeekTargetRef.current != null) {
+                const safePos = Math.max(
+                  0.05,
+                  Math.min(lastSeekTargetRef.current, dur - 2)
+                );
+                await TrackPlayer.seekTo(safePos);
+              }
+              await TrackPlayer.play();
+            } catch (e) {
+              console.warn("auto-advance suppress failed", e);
+            } finally {
+              lastSeekAtRef.current = 0;
+              lastSeekTargetRef.current = null;
+            }
+            return;
+          }
+        }
         if (suppressTrackChangeRef.current) {
           if (desiredIndexRef.current === nextTrack) {
             suppressTrackChangeRef.current = false;
@@ -295,6 +368,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     const subQueueEnded = TrackPlayer.addEventListener(
       Event.PlaybackQueueEnded,
       () => {
+        log("[QUEUE_ENDED]");
         suppressTrackChangeRef.current = false;
         desiredIndexRef.current = null;
         setIntends(false);
@@ -303,6 +377,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     );
 
     const subError = TrackPlayer.addEventListener(Event.PlaybackError, (e) => {
+      log("[PLAYBACK_ERROR]", e);
       suppressTrackChangeRef.current = false;
       desiredIndexRef.current = null;
       console.warn("PlaybackError:", e);
@@ -340,6 +415,8 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
         addToFavorites,
         removeFromFavorites,
         isFavorite,
+        setUiIntends,
+        noteExternalSeek,
       }}
     >
       {children}
