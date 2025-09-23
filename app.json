@@ -2,7 +2,7 @@
   "expo": {
     "name": "Muziek Kids",
     "slug": "muziek-voor-kinderopvang",
-    "version": "1.0.4",
+    "version": "1.0.7",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
@@ -11,7 +11,7 @@
     "ios": {
       "bundleIdentifier": "com.tuacompany.muziekvoorkinderopvang",
       "supportsTablet": true,
-      "buildNumber": "4",
+      "buildNumber": "7",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
         "NSCameraUsageDescription": "Deze app gebruikt de camera niet actief, maar bevat modules die cameratoegang kunnen aanvragen.",

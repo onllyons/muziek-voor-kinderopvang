@@ -5,6 +5,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import OverflowMenu from '@/components/OverflowMenu';
 import { usePlayer } from '@/contexts/PlayerContext';
 import TrackRow from '@/components/TrackRow';
+import { useRouter } from "expo-router";
 
 const WHITE_NOISE_TRACKS = [
   'Regensound','Oceaangolven','Vogelgeluiden','Zachte Wind','Krekels','Waterval','Bos Geluiden',
@@ -16,6 +17,7 @@ const URLS_BY_TITLE: Record<string, string> = {
 
 export default function WhiteNoiseScreen() {
   const { playFromList } = usePlayer();
+  const router = useRouter();
   const [overflowMenu, setOverflowMenu] = React.useState({
     visible: false,
     track: null as null | { title: string; audioUrl?: string; coverUrl: string | number },
@@ -40,7 +42,7 @@ export default function WhiteNoiseScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <BackHeader />
+      <BackHeader onBack={() => router.replace("/(drawer)/index")} />
 
       <View style={styles.categoryHeader}>
         <LinearGradient

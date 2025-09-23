@@ -1,21 +1,15 @@
 {
-  "cli": {
-    "version": ">= 16.18.0",
-    "appVersionSource": "remote"
-  },
+  "cli": { "version": ">= 16.18.0", "appVersionSource": "remote" },
   "build": {
-    "development": {
-      "developmentClient": true,
-      "distribution": "internal"
-    },
-    "preview": {
-      "distribution": "internal"
-    },
+    "development": { "developmentClient": true, "distribution": "internal" },
+    "preview": { "distribution": "internal" },
     "production": {
-      "autoIncrement": true
+      "autoIncrement": true,
+      "env": {
+        "EXPO_PUBLIC_SUPABASE_URL": "https://ipkpczvxxlxalmoasodi.supabase.co",
+        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "sb_publishable_9pX2CKuSll_nmArE_zBfQQ_5ZeKnhGD"
+      }
     }
   },
-  "submit": {
-    "production": {}
-  }
+  "submit": { "production": {} }
 }

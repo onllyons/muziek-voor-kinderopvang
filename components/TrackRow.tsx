@@ -59,7 +59,7 @@ function TrackRowBase({
           onPress={handlePlayPress}
           accessibilityRole="button"
           accessibilityLabel={
-            isCurrent ? (showPause ? "Pauză" : "Redă") : "Redă"
+            isCurrent ? (showPause ? "Pause" : "Play") : "Play"
           }
           accessibilityState={a11yState}
           hitSlop={8}
@@ -76,6 +76,7 @@ function TrackRowBase({
         </Text>
       </View>
 
+      {/*
       {onRemoveFavorite ? (
         <Pressable
           style={({ pressed }) => [s.more, pressed && s.pressedLight]}
@@ -97,6 +98,8 @@ function TrackRowBase({
           <MoreVertical size={20} color="#534F50" />
         </Pressable>
       ) : null}
+      */}
+      
     </View>
   );
 }
