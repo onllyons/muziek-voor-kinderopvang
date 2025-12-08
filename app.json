@@ -2,7 +2,7 @@
   "expo": {
     "name": "Muziek Kids",
     "slug": "muziek-voor-kinder",
-    "version": "1.0.0",
+    "version": "1.0.2",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
@@ -33,7 +33,7 @@
     },
     "android": {
       "package": "com.tuacompany.muziekvoorkinder",
-      "versionCode": 1,
+      "versionCode": 6,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/icon.png",
         "backgroundColor": "#FFFFFF"
@@ -41,6 +41,9 @@
       "permissions": [
         "android.permission.RECORD_AUDIO",
         "android.permission.MODIFY_AUDIO_SETTINGS"
+      ],
+      "blockedPermissions": [
+        "android.permission.CAMERA"
       ]
     },
     "web": {
