@@ -7,6 +7,7 @@ import React, {
   ReactNode,
 } from "react";
 import TrackPlayer, { Event, State } from "react-native-track-player";
+import { DEFAULT_COVER } from "@/lib/queries";
 
 export type Track = {
   title: string;
@@ -26,9 +27,9 @@ type PlayerContextType = {
   setUiIntends: (val: boolean) => void;
 
   playFromList: (
-    list: { title: string; url: string }[],
+    list: { title: string; url: string; coverUrl?: string | number }[],
     startIndex: number,
-    coverUrl: string | number,
+    coverUrl?: string | number,
     opts?: { autoExpand?: boolean }
   ) => Promise<void>;
   setCurrentTrack: (
@@ -117,9 +118,9 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     favorites.some((t) => t.title === title);
 
   async function playFromList(
-    list: { title: string; url: string }[],
+    list: { title: string; url: string; coverUrl?: string | number }[],
     startIndex: number,
-    coverUrl: string | number,
+    coverUrl?: string | number,
     opts: { autoExpand?: boolean } = {}
   ) {
     log("[PLAY_FROM_LIST] startIndex=", startIndex, "inputLen=", list.length);
@@ -131,10 +132,11 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       return;
     }
 
+    const fallbackCover = coverUrl ?? DEFAULT_COVER;
     const tracks: Track[] = list.map((it) => ({
       title: it.title,
       audioUrl: it.url,
-      coverUrl,
+      coverUrl: it.coverUrl ?? fallbackCover,
     }));
     log("[PLAY_FROM_LIST] tracksLen=", tracks.length);
 

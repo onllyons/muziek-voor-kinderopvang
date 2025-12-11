@@ -72,9 +72,13 @@ const handleSearch = async (q: string) => {
       q: `%${q}%`, // 🔑 pentru ilike
     });
 
-    const items = edgesToArray<{ id: string; title: string; lyrics?: string }>(
-      data.songsCollection
-    );
+    const items = edgesToArray<{
+      id: string;
+      title: string;
+      lyrics?: string;
+      optimized_file?: string | null;
+      cover_file?: string | null;
+    }>(data.songsCollection);
 
     console.log("📊 Results found:", items.length);
     setResults(items);

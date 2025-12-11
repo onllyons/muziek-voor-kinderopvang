@@ -39,7 +39,7 @@ query MenuTags {
 export const SONGS_BY_TAG_ID = `
 query SongsByTagId($tagId: UUID!) {
   songs_tagsCollection(filter: { tag_id: { eq: $tagId } }) {
-    edges { node { songs { id title optimized_file } } }
+    edges { node { songs { id title optimized_file cover_file } } }
   }
 }
 `;
@@ -61,6 +61,7 @@ query SearchSongs($q: String!) {
         title
         lyrics
         optimized_file
+        cover_file
       }
     }
   }

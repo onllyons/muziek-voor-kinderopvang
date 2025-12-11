@@ -6,12 +6,12 @@ import OverflowMenu from '@/components/OverflowMenu';
 import { usePlayer } from '@/contexts/PlayerContext';
 import TrackRow from '@/components/TrackRow';
 import { useRouter } from "expo-router";
+import { DEFAULT_COVER } from '@/lib/queries';
 
 const WHITE_NOISE_TRACKS = [
   'Regensound','Oceaangolven','Vogelgeluiden','Zachte Wind','Krekels','Waterval','Bos Geluiden',
 ];
 
-const COVER = 'https://aapscm.onllyons.com/muziek/player.png';
 const URLS_BY_TITLE: Record<string, string> = {
 };
 
@@ -33,7 +33,7 @@ export default function WhiteNoiseScreen() {
   const handlePlayAt = (title: string) => {
     const index = list.findIndex((t) => t.title === title);
     if (index < 0) return;
-    playFromList(list, index, COVER).catch(() => {});
+    playFromList(list, index, DEFAULT_COVER).catch(() => {});
   };
 
   const handleOverflowPress = (title: string, anchor: { x: number; y: number }) => {
@@ -61,13 +61,13 @@ export default function WhiteNoiseScreen() {
         renderItem={({ item }) => (
           <TrackRow
             title={item.title}
-            coverUrl={COVER}
+            coverUrl={DEFAULT_COVER}
             url={item.url}
             onPlay={() => handlePlayAt(item.title)}
             onOverflowPress={(_, anchor) =>
               setOverflowMenu({
                 visible: true,
-                track: { title: item.title, audioUrl: item.url, coverUrl: COVER },
+                track: { title: item.title, audioUrl: item.url, coverUrl: DEFAULT_COVER },
                 position: anchor,
               })
             }

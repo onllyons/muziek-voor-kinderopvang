@@ -2,10 +2,7 @@ import React from "react";
 import { FlatList } from "react-native";
 import TrackRow from "@/components/TrackRow";
 import { usePlayer } from "@/contexts/PlayerContext";
-
-const COVER_URL = "https://aapscm.onllyons.com/muziek/player.png";
-const B2_PUBLIC_URL =
-  "https://f003.backblazeb2.com/file/l2p-kids-directus-test/";
+import { B2_PUBLIC_URL, DEFAULT_COVER, buildMediaUrl } from "@/lib/queries";
 
 export default function SearchResults({ results }: { results: any[] }) {
   const { playFromList } = usePlayer();
@@ -17,6 +14,9 @@ export default function SearchResults({ results }: { results: any[] }) {
     .map((s) => ({
       title: s.title,
       url: `${B2_PUBLIC_URL}${s.optimized_file}.aac`,
+      coverUrl: s.cover_file
+        ? buildMediaUrl(s.cover_file, ".png")
+        : DEFAULT_COVER,
     }));
 
   return (
@@ -27,8 +27,8 @@ export default function SearchResults({ results }: { results: any[] }) {
         <TrackRow
           title={item.title}
           url={item.url}
-          coverUrl={COVER_URL}
-          onPlay={() => playFromList(tracks, index, COVER_URL)}
+          coverUrl={item.coverUrl}
+          onPlay={() => playFromList(tracks, index, DEFAULT_COVER)}
         />
       )}
     />

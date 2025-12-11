@@ -14,7 +14,7 @@ import OverflowMenu from "@/components/OverflowMenu";
 import { usePlayer } from "@/contexts/PlayerContext";
 import TrackRow from "@/components/TrackRow";
 import { LinearGradient } from "expo-linear-gradient";
-import { fetchTracks, ServerTrack } from "@/lib/queries";
+import { DEFAULT_COVER, fetchTracks, ServerTrack } from "@/lib/queries";
 import { useRouter } from "expo-router";
 import { runQ } from "@/lib/network-queue";
 
@@ -22,7 +22,6 @@ export default function CategoryListScreen() {
   const router = useRouter();
   const { playFromList } = usePlayer();
 
-  const COVER_URL = "https://aapscm.onllyons.com/muziek/player.png";
   const [tracks, setTracks] = React.useState<ServerTrack[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [refreshing, setRefreshing] = React.useState(false);
@@ -45,7 +44,7 @@ export default function CategoryListScreen() {
     const item = tracks.find((t) => t.title === songTitle);
     setOverflowMenu({
       visible: true,
-      track: { title: songTitle, audioUrl: item?.url, coverUrl: COVER_URL },
+      track: { title: songTitle, audioUrl: item?.url, coverUrl: item?.coverUrl ?? DEFAULT_COVER },
       position: anchor,
     });
   };
@@ -122,13 +121,16 @@ export default function CategoryListScreen() {
           <TrackRow
             title={item.title}
             url={item.url}
-            coverUrl={COVER_URL}
+            coverUrl={item.coverUrl}
             onOverflowPress={handleOverflowPress}
             onPlay={() =>
               playFromList(
-                tracks.map((t) => ({ title: t.title, url: t.url })),
-                index,
-                COVER_URL
+                tracks.map((t) => ({
+                  title: t.title,
+                  url: t.url,
+                  coverUrl: t.coverUrl,
+                })),
+                index
               )
             }
           />

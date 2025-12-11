@@ -19,12 +19,9 @@ import { SONGS_BY_TAG_ID } from "@/lib/queries-graphql";
 import { runQ } from "@/lib/network-queue";
 import { SearchContext } from "../_layout";
 import SearchResults from "@/components/SearchResults";
+import { B2_PUBLIC_URL, DEFAULT_COVER, buildMediaUrl } from "@/lib/queries";
 
-const COVER_URL = "https://aapscm.onllyons.com/muziek/player.png";
-const B2_PUBLIC_URL =
-  "https://f003.backblazeb2.com/file/l2p-kids-directus-test/";
-
-type Song = { id: string; title: string; optimized_file: string | null };
+type Song = { id: string; title: string; optimized_file: string | null; cover_file?: string | null };
 type Resp = { songs_tagsCollection: { edges: { node: { songs: Song } }[] } };
 
 export default function SongsByTagScreen() {
@@ -39,9 +36,9 @@ export default function SongsByTagScreen() {
     origin?: "themes" | "home";
   }>();
 
-  const [tracks, setTracks] = React.useState<{ title: string; url: string }[]>(
-    []
-  );
+  const [tracks, setTracks] = React.useState<
+    { title: string; url: string; coverUrl?: string | number }[]
+  >([]);
   const [loading, setLoading] = React.useState(true);
   const [refreshing, setRefreshing] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
@@ -60,6 +57,9 @@ export default function SongsByTagScreen() {
         .map((s) => ({
           title: s.title,
           url: `${B2_PUBLIC_URL}${s.optimized_file}.aac`,
+          coverUrl: s.cover_file
+            ? buildMediaUrl(s.cover_file, ".png")
+            : DEFAULT_COVER,
         }));
       setTracks(mapped);
     } catch (e: any) {
@@ -146,12 +146,16 @@ export default function SongsByTagScreen() {
           <TrackRow
             title={item.title}
             url={item.url}
-            coverUrl={COVER_URL}
+            coverUrl={item.coverUrl ?? DEFAULT_COVER}
             onPlay={() =>
               playFromList(
-                tracks.map((t) => ({ title: t.title, url: t.url })),
+                tracks.map((t) => ({
+                  title: t.title,
+                  url: t.url,
+                  coverUrl: t.coverUrl,
+                })),
                 index,
-                COVER_URL
+                DEFAULT_COVER
               )
             }
           />
