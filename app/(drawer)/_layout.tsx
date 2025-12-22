@@ -115,6 +115,13 @@ const handleSearch = async (q: string) => {
 
 
         <Drawer.Screen name="index" />
+        <Drawer.Screen
+          name="feedback"
+          options={{
+            drawerLabel: "Feedback",
+            headerTitle: "Feedback",
+          }}
+        />
         <Drawer.Screen name="themes" options={{ drawerItemStyle: { display: "none" } }} />
         <Drawer.Screen name="white-noise" options={{ drawerItemStyle: { display: "none" } }} />
         <Drawer.Screen name="muziek" options={{ drawerItemStyle: { display: "none" } }} />
