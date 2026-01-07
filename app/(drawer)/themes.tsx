@@ -27,7 +27,7 @@ type Tag = {
 };
 
 export default function ThemesScreen() {
-  const { setFilter } = usePlayer();
+  const { setFilter, currentTrack } = usePlayer();
   const router = useRouter();
   const { results } = useContext(SearchContext); // 👈 aici primești results
 
@@ -35,6 +35,7 @@ export default function ThemesScreen() {
   const [loading, setLoading] = React.useState(true);
   const [refreshing, setRefreshing] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
+  const bottomPadding = currentTrack ? 140 : 30;
 
   const load = React.useCallback(async () => {
     setError(null);
@@ -147,12 +148,12 @@ export default function ThemesScreen() {
                 renderItem={renderThemeItem}
                 keyExtractor={(item) => String(item.id)}
                 numColumns={2}
-                contentContainerStyle={styles.listContent}
+                contentContainerStyle={[styles.listContent, { paddingBottom: bottomPadding }]}
                 columnWrapperStyle={styles.row}
                 showsVerticalScrollIndicator={false}
                 ListEmptyComponent={
                   <Text style={{ textAlign: "center", marginTop: 24 }}>
-                    Nu există teme disponibile.
+                    No theme
                   </Text>
                 }
                 refreshControl={

@@ -26,7 +26,7 @@ export default function FeedbackScreen() {
   const handleSubmit = async () => {
     const text = message.trim();
     if (!text) {
-      setError("Please write your feedback.");
+      setError("Schrijf alsjeblieft je feedback.");
       return;
     }
 
@@ -41,7 +41,11 @@ export default function FeedbackScreen() {
       setSuccess(true);
       setMessage("");
     } catch (e: any) {
-      setError(e?.message ?? "Could not send feedback.");
+      if (e?.code === "NETWORK" || e?.code === "TIMEOUT" || e?.code === "OFFLINE") {
+        setError("Netwerkfout. Controleer je verbinding en probeer opnieuw.");
+      } else {
+        setError("Feedback verzenden is niet gelukt.");
+      }
     } finally {
       setSubmitting(false);
     }
@@ -56,14 +60,14 @@ export default function FeedbackScreen() {
         <View style={styles.container}>
           <Text style={styles.title}>Feedback</Text>
           <Text style={styles.subtitle}>
-            Share anything we should improve or add. We save it in Supabase and show it in Directus.
+            Loop je ergens tegenaan of heb je tips/ideeën? Laat het hier weten!
           </Text>
 
           <TextInput
             style={styles.input}
             multiline
             numberOfLines={6}
-            placeholder="Example: Please add more calm tracks for nap time."
+            placeholder="Voorbeeld: Voeg meer rustige nummers toe voor het slapen gaan."
             placeholderTextColor="#9AA0A6"
             value={message}
             onChangeText={(val) => {
@@ -88,7 +92,7 @@ export default function FeedbackScreen() {
             {submitting ? (
               <ActivityIndicator color="#fff" />
             ) : (
-              <Text style={styles.buttonText}>Submit</Text>
+              <Text style={styles.buttonText}>Versturen</Text>
             )}
           </TouchableOpacity>
         </View>
@@ -98,9 +102,9 @@ export default function FeedbackScreen() {
         <View style={styles.alertOverlay}>
           <BlurView intensity={45} tint="light" style={styles.blur} />
           <View style={styles.alertCard}>
-            <Text style={styles.alertTitle}>Thank you!</Text>
+            <Text style={styles.alertTitle}>Bedankt!</Text>
             <Text style={styles.alertText}>
-              Your feedback was sent successfully.
+              Je feedback is verstuurd.
             </Text>
             <TouchableOpacity
               style={styles.alertButton}

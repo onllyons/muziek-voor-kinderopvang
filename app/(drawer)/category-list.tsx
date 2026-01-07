@@ -20,7 +20,7 @@ import { runQ } from "@/lib/network-queue";
 
 export default function CategoryListScreen() {
   const router = useRouter();
-  const { playFromList } = usePlayer();
+  const { playFromList, currentTrack } = usePlayer();
 
   const [tracks, setTracks] = React.useState<ServerTrack[]>([]);
   const [loading, setLoading] = React.useState(true);
@@ -88,6 +88,8 @@ export default function CategoryListScreen() {
     );
   }
 
+  const bottomPadding = currentTrack ? 140 : 8;
+
   return (
     <SafeAreaView style={styles.container}>
       <BackHeader onBack={() => router.replace("/")} />
@@ -108,7 +110,7 @@ export default function CategoryListScreen() {
       <FlatList
         data={tracks}
         keyExtractor={(item, i) => `${item.title}-${i}`}
-        contentContainerStyle={styles.listContent}
+        contentContainerStyle={[styles.listContent, { paddingBottom: bottomPadding }]}
         ListEmptyComponent={
           <Text style={{ textAlign: "center", marginTop: 24 }}>
             No songs found.

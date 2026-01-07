@@ -16,7 +16,7 @@ const URLS_BY_TITLE: Record<string, string> = {
 };
 
 export default function WhiteNoiseScreen() {
-  const { playFromList } = usePlayer();
+  const { playFromList, currentTrack } = usePlayer();
   const router = useRouter();
   const [overflowMenu, setOverflowMenu] = React.useState({
     visible: false,
@@ -29,6 +29,7 @@ export default function WhiteNoiseScreen() {
     () => WHITE_NOISE_TRACKS.map((title) => ({ title, url: URLS_BY_TITLE[title] ?? '' })),
     []
   );
+  const bottomPadding = currentTrack ? 140 : 8;
 
   const handlePlayAt = (title: string) => {
     const index = list.findIndex((t) => t.title === title);
@@ -58,6 +59,7 @@ export default function WhiteNoiseScreen() {
       <FlatList
         data={list}
         keyExtractor={(item, i) => `${item.title}-${i}`}
+        contentContainerStyle={[styles.listContent, { paddingBottom: bottomPadding }]}
         renderItem={({ item }) => (
           <TrackRow
             title={item.title}

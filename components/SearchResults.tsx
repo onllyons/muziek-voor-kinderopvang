@@ -5,7 +5,7 @@ import { usePlayer } from "@/contexts/PlayerContext";
 import { B2_PUBLIC_URL, DEFAULT_COVER, buildMediaUrl } from "@/lib/queries";
 
 export default function SearchResults({ results }: { results: any[] }) {
-  const { playFromList } = usePlayer();
+  const { playFromList, currentTrack } = usePlayer();
 
   if (!results.length) return null;
 
@@ -19,10 +19,13 @@ export default function SearchResults({ results }: { results: any[] }) {
         : DEFAULT_COVER,
     }));
 
+  const bottomPadding = currentTrack ? 140 : 8;
+
   return (
     <FlatList
       data={tracks}
       keyExtractor={(item, i) => `${item.title}-${i}`}
+      contentContainerStyle={{ paddingBottom: bottomPadding }}
       renderItem={({ item, index }) => (
         <TrackRow
           title={item.title}

@@ -27,7 +27,7 @@ type Resp = { songs_tagsCollection: { edges: { node: { songs: Song } }[] } };
 export default function SongsByTagScreen() {
   const router = useRouter();
   const { results } = React.useContext(SearchContext);
-  const { playFromList } = usePlayer();
+  const { playFromList, currentTrack } = usePlayer();
   const { id, name, g1, g2, origin } = useLocalSearchParams<{
     id: string;
     name?: string;
@@ -88,6 +88,8 @@ export default function SongsByTagScreen() {
     else router.replace("/");
   };
 
+  const bottomPadding = currentTrack ? 140 : 8;
+
   if (loading) {
     return (
       <SafeAreaView style={s.container}>
@@ -133,7 +135,7 @@ export default function SongsByTagScreen() {
       <FlatList
         data={tracks}
         keyExtractor={(item, i) => `${item.title}-${i}`}
-        contentContainerStyle={s.listContent}
+        contentContainerStyle={[s.listContent, { paddingBottom: bottomPadding }]}
         ListEmptyComponent={
           <Text style={{ textAlign: "center", marginTop: 24 }}>
             No songs found.
