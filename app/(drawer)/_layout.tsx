@@ -33,7 +33,7 @@ function HeaderSearchBar({ onSearch }: { onSearch: (q: string) => void }) {
   return (
     <View style={[styles.searchWrap, { width: HEADER_SEARCH_WIDTH }]}>
       <TextInput
-        placeholder="Zoek muziek"
+        placeholder="Zoek muziek 1"
         placeholderTextColor="#9AA0A6"
         style={styles.searchInput}
         value={value}

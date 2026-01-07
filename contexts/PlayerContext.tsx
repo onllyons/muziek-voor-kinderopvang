@@ -6,8 +6,14 @@ import React, {
   useState,
   ReactNode,
 } from "react";
+import { Alert } from "react-native";
 import TrackPlayer, { Event, State } from "react-native-track-player";
 import { DEFAULT_COVER } from "@/lib/queries";
+import {
+  applyMaxVolume,
+  getVolumeDebugInfo,
+  isVolumeDebugEnabled,
+} from "@/lib/volume";
 
 export type Track = {
   title: string;
@@ -78,6 +84,32 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       return await fn();
     } finally {
       cmdLockRef.current = false;
+    }
+  }
+
+  async function showVolumeDebug(source: string) {
+    if (!__DEV__ && !isVolumeDebugEnabled()) return;
+    try {
+      const info = await getVolumeDebugInfo();
+      const loadedAt = info.loadedAt
+        ? new Date(info.loadedAt).toISOString()
+        : "never";
+      Alert.alert(
+        "Volume debug",
+        `source: ${source}\n` +
+          `supabase raw: ${String(info.raw ?? "null")}\n` +
+          `debug enabled: ${info.debugEnabled} (${String(
+            info.debugRaw ?? "null"
+          )})\n` +
+          `normalized: ${info.normalized}\n` +
+          `curve: ${info.curve} (${String(info.curveRaw ?? "null")})\n` +
+          `effective: ${info.effective}\n` +
+          `player volume: ${info.player ?? "unknown"}\n` +
+          `system volume: n/a\n` +
+          `loaded at: ${loadedAt}`
+      );
+    } catch (e) {
+      console.warn("volume debug error:", e);
     }
   }
 
@@ -161,6 +193,8 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
         );
         await TrackPlayer.skip(startIndex);
         await TrackPlayer.play();
+        await applyMaxVolume();
+        await showVolumeDebug("playFromList");
         setIsExpanded(!!opts.autoExpand);
         log("[PLAY_FROM_LIST] queued & playing at index", startIndex);
       } catch (e) {
@@ -206,6 +240,8 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
           artwork: track.coverUrl as any,
         });
         await TrackPlayer.play();
+        await applyMaxVolume();
+        await showVolumeDebug("setCurrentTrack");
         setIsExpanded(!!opts.autoExpand);
       } catch (e) {
         console.warn("setCurrentTrack error:", e);
@@ -232,6 +268,8 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       } else {
         setIntends(true);
         await TrackPlayer.play();
+        await applyMaxVolume();
+        await showVolumeDebug("togglePlay");
       }
     } catch (e) {
       console.warn("togglePlay error:", e);
@@ -260,6 +298,8 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       try {
         await TrackPlayer.skip(targetIndex);
         await TrackPlayer.play();
+        await applyMaxVolume();
+        await showVolumeDebug("skipTo");
       } catch (e) {
         console.warn("skipTo error:", e);
         suppressTrackChangeRef.current = false;

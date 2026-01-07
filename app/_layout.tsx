@@ -10,6 +10,7 @@ import TrackPlayer, {
 
 import { PlayerProvider } from "@/contexts/PlayerContext";
 import PlayerView from "@/components/PlayerView";
+import { loadAndApplyMaxVolume } from "@/lib/volume";
 import playbackService from "../service";
 
 TrackPlayer.registerPlaybackService(() => playbackService);
@@ -45,6 +46,7 @@ export default function RootLayout() {
         });
 
         if (!cancelled) setReady(true);
+        loadAndApplyMaxVolume();
       } catch (e) {
         console.warn("TrackPlayer setup/updateOptions error:", e);
         if (!cancelled) setReady(true);
