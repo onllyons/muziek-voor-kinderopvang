@@ -33,7 +33,7 @@ function HeaderSearchBar({ onSearch }: { onSearch: (q: string) => void }) {
   return (
     <View style={[styles.searchWrap, { width: HEADER_SEARCH_WIDTH }]}>
       <TextInput
-        placeholder="Zoek muziek 1"
+        placeholder="Zoek muziek"
         placeholderTextColor="#9AA0A6"
         style={styles.searchInput}
         value={value}
@@ -114,7 +114,7 @@ const handleSearch = async (q: string) => {
       >
 
 
-        <Drawer.Screen name="index" />
+        <Drawer.Screen name="index" options={{ drawerLabel: "Startpagina" }} />
         <Drawer.Screen
           name="feedback"
           options={{

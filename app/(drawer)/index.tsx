@@ -80,6 +80,9 @@ export default function HomeScreen() {
   );
 
   const renderMenuTag = (tag: MenuTag) => {
+    const normalizedName = tag.name?.trim().toLowerCase();
+    const isWhiteNoise =
+      normalizedName === "witte ruis" || normalizedName === "white noise";
     const colors: [string, string] = [
       tag.gradient_1 ?? "#cccccc",
       tag.gradient_2 ?? "#aaaaaa",
@@ -90,16 +93,18 @@ export default function HomeScreen() {
         style={styles.buttonWrapper}
         activeOpacity={0.85}
         onPress={() =>
-          router.push({
-            pathname: "/tag/[id]",
-            params: {
-              id: String(tag.id),
-              name: tag.name,
-              g1: tag.gradient_1 ?? "#86EABA",
-              g2: tag.gradient_2 ?? "#4FBC80",
-              origin: "home",
-            },
-          })
+          isWhiteNoise
+            ? router.push("/white-noise")
+            : router.push({
+                pathname: "/tag/[id]",
+                params: {
+                  id: String(tag.id),
+                  name: tag.name,
+                  g1: tag.gradient_1 ?? "#86EABA",
+                  g2: tag.gradient_2 ?? "#4FBC80",
+                  origin: "home",
+                },
+              })
         }
       >
         <View style={styles.shadowWrap}>
