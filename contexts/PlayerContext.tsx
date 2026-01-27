@@ -30,7 +30,9 @@ type PlayerContextType = {
   favorites: Track[];
   playlist: Track[];
   currentIndex: number;
+  hidePlayerUI: boolean;
   setUiIntends: (val: boolean) => void;
+  setHidePlayerUI: (val: boolean) => void;
 
   playFromList: (
     list: { title: string; url: string; coverUrl?: string | number }[],
@@ -73,6 +75,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   const [favorites, setFavorites] = useState<Track[]>([]);
   const [playlist, setPlaylist] = useState<Track[]>([]);
   const [currentIndex, setCurrentIndex] = useState<number>(-1);
+  const [hidePlayerUI, setHidePlayerUI] = useState(false);
 
   const lastToggleRef = useRef(0);
 
@@ -446,6 +449,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
         favorites,
         playlist,
         currentIndex,
+        hidePlayerUI,
         playFromList,
         setCurrentTrack,
         togglePlay,
@@ -458,6 +462,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
         removeFromFavorites,
         isFavorite,
         setUiIntends,
+        setHidePlayerUI,
         noteExternalSeek,
       }}
     >

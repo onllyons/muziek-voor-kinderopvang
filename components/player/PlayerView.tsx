@@ -33,6 +33,7 @@ export default function PlayerView() {
     currentIndex,
     setUiIntends,
     noteExternalSeek,
+    hidePlayerUI,
   } = usePlayer();
 
   const canPrev = currentIndex > 0;
@@ -65,7 +66,7 @@ export default function PlayerView() {
 
   const wasPlayingBeforeScrub = React.useRef(false);
 
-  if (!currentTrack) return null;
+  if (hidePlayerUI || !currentTrack) return null;
   const coverSource =
     typeof currentTrack.coverUrl === "number"
       ? currentTrack.coverUrl

@@ -24,7 +24,7 @@ import { buildMediaUrl } from "@/lib/queries";
 type NoiseItem = {
   id: string;
   title: string;
-  url: string;
+  url: string | number;
 };
 
 type SongRow = {
@@ -38,7 +38,7 @@ type TagMeta = { id: string; name: string | null; gradient_1: string | null; gra
 
 export default function WhiteNoiseScreen() {
   const router = useRouter();
-  const { setCurrentTrack } = usePlayer();
+  const { setHidePlayerUI } = usePlayer();
   const [activeTitle, setActiveTitle] = React.useState<string | null>(null);
   const [loadingTitle, setLoadingTitle] = React.useState<string | null>(null);
   const [items, setItems] = React.useState<NoiseItem[]>([]);
@@ -55,14 +55,15 @@ export default function WhiteNoiseScreen() {
     setActiveTitle(null);
   }, []);
 
-useFocusEffect(
-  React.useCallback(() => {
-    // nu facem nimic la intrare
-    return () => {
-      stopPlayback(); // doar cleanup la iesire
-    };
-  }, [stopPlayback])
-);
+  useFocusEffect(
+    React.useCallback(() => {
+      setHidePlayerUI(true);
+      return () => {
+        setHidePlayerUI(false);
+        stopPlayback();
+      };
+    }, [setHidePlayerUI, stopPlayback])
+  );
 
 
   const load = React.useCallback(async () => {
@@ -100,6 +101,14 @@ useFocusEffect(
         }))
         .filter((item) => !!item.url);
 
+      if (__DEV__) {
+        list.unshift({
+          id: "local-test-wav",
+          title: "Local Test WAV",
+          url: require("../../assets/fara-pauza.wav"),
+        });
+      }
+
       setItems(list);
     } catch (e: any) {
       setError(e?.message ?? "Kon de white noise lijst niet laden.");
@@ -126,6 +135,9 @@ useFocusEffect(
 const startPlayback = async (item: NoiseItem) => {
   setLoadingTitle(item.title);
   try {
+    if (__DEV__) {
+      console.log("[white-noise] play url:", item.title, item.url);
+    }
     // ASIGURĂ setup-ul playerului
     try {
       await TrackPlayer.getState();
@@ -153,7 +165,6 @@ const startPlayback = async (item: NoiseItem) => {
     setLoadingTitle(null);
   }
 };
-
 
   const toggleItem = async (item: NoiseItem, value: boolean) => {
     if (loadingTitle && loadingTitle !== item.title) return;
