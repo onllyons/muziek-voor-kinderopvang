@@ -22,6 +22,8 @@ type Props = {
 
 function TrackRowBase({
   title,
+  coverUrl,
+  url,
   onPlay,
   onOverflowPress,
   onRemoveFavorite,
@@ -30,6 +32,17 @@ function TrackRowBase({
   const isCurrent = currentTrack?.title === title;
 
   const handlePlayPress = async () => {
+    if (__DEV__) {
+      console.log("[TRACK_ROW] press", {
+        title,
+        isCurrent,
+        showPause,
+        url: url ?? null,
+        hasUrl: !!url,
+        coverUrl: coverUrl ?? null,
+        hasCoverUrl: !!coverUrl,
+      });
+    }
     if (isCurrent) await togglePlay();
     else onPlay();
   };

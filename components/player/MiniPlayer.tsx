@@ -1,8 +1,9 @@
 import React from "react";
-import { View, Text, Image, Pressable, StyleSheet } from "react-native";
+import { View, Text, Pressable, StyleSheet } from "react-native";
 import { Play, Pause } from "lucide-react-native";
 import ProgressBar from "./ProgressBar";
 import { formatTime } from "@/lib/time";
+import CoverImage from "./CoverImage";
 
 type Props = {
   title: string;
@@ -44,7 +45,7 @@ export default function MiniPlayer({
           accessibilityLabel={`Deschide playerul pentru ${title}`}
           hitSlop={6}
         >
-          <Image source={coverSource} style={styles.cover} />
+          <CoverImage source={coverSource} style={styles.cover} />
           
           <View style={styles.boxInfo}>
             <Text style={styles.title} numberOfLines={1}>

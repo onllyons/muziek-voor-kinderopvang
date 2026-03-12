@@ -19,6 +19,16 @@ export async function fetchTracks(): Promise<ServerTrack[]> {
     .select('title, optimized_file, cover_file');
 
   if (error) throw error;
+  if (__DEV__) {
+    console.log("[FETCH_TRACKS] raw rows", {
+      count: (data ?? []).length,
+      rows: (data ?? []).map((row: SongRow) => ({
+        title: row.title,
+        optimized_file: row.optimized_file ?? null,
+        cover_file: row.cover_file ?? null,
+      })),
+    });
+  }
   return (data ?? [])
     .map((row: SongRow) => ({
       title: row.title,

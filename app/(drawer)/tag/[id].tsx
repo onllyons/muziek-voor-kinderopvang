@@ -55,6 +55,19 @@ export default function SongsByTagScreen() {
         gqlFetch<Resp>(SONGS_BY_TAG_ID, { tagId: id })
       );
       const nodes = edgesToArray<{ songs: Song }>(data.songs_tagsCollection);
+      if (__DEV__) {
+        console.log("[TAG_SCREEN] raw songs", {
+          tagId: id,
+          tagName: name ?? null,
+          count: nodes.length,
+          songs: nodes.map((node) => ({
+            id: node.songs?.id ?? null,
+            title: node.songs?.title ?? null,
+            optimized_file: node.songs?.optimized_file ?? null,
+            cover_file: node.songs?.cover_file ?? null,
+          })),
+        });
+      }
       const mapped = nodes
         .map((n) => n.songs)
         .filter((s) => !!s.optimized_file)
@@ -65,8 +78,28 @@ export default function SongsByTagScreen() {
             ? buildMediaUrl(s.cover_file, ".png")
             : DEFAULT_COVER,
         }));
+      if (__DEV__) {
+        console.log("[TAG_SCREEN] mapped tracks", {
+          tagId: id,
+          tagName: name ?? null,
+          count: mapped.length,
+          tracks: mapped.map((track, index) => ({
+            index,
+            title: track.title,
+            url: track.url ?? null,
+            hasUrl: !!track.url,
+            coverUrl: track.coverUrl ?? null,
+            hasCoverUrl: !!track.coverUrl,
+          })),
+        });
+      }
       setTracks(mapped);
     } catch (e: any) {
+      console.warn("[TAG_SCREEN] load error", {
+        tagId: id,
+        tagName: name ?? null,
+        message: e?.message ?? String(e),
+      });
       setError(e?.message ?? "Failed to load");
       setTracks([]);
     } finally {
@@ -153,7 +186,18 @@ export default function SongsByTagScreen() {
             title={item.title}
             url={item.url}
             coverUrl={item.coverUrl ?? DEFAULT_COVER}
-            onPlay={() =>
+            onPlay={() => {
+              if (__DEV__) {
+                console.log("[TAG_SCREEN] onPlay", {
+                  index,
+                  title: item.title,
+                  url: item.url ?? null,
+                  hasUrl: !!item.url,
+                  coverUrl: item.coverUrl ?? null,
+                  hasCoverUrl: !!item.coverUrl,
+                  repeatMode: isOvergang ? "track" : "queue",
+                });
+              }
               playFromList(
                 tracks.map((t) => ({
                   title: t.title,
@@ -163,8 +207,8 @@ export default function SongsByTagScreen() {
                 index,
                 DEFAULT_COVER,
                 { repeatMode: isOvergang ? RepeatMode.Track : RepeatMode.Queue }
-              )
-            }
+              );
+            }}
           />
         )}
       />

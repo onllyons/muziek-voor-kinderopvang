@@ -1,9 +1,10 @@
 import React from "react";
-import { View, Text, Image, Pressable, StyleSheet } from "react-native";
+import { View, Text, Pressable, StyleSheet } from "react-native";
 import { Play, Pause, SkipBack, SkipForward } from "lucide-react-native";
 import ProgressBar from "./ProgressBar";
 import BackHeader from "@/components/BackHeader";
 import { formatTime } from "@/lib/time";
+import CoverImage from "./CoverImage";
 
 type Props = {
   title: string;
@@ -47,7 +48,7 @@ export default function ExpandedPlayer({
       <BackHeader onBack={onClose} />
 
       <View style={styles.center}>
-        <Image source={coverSource} style={styles.cover} />
+        <CoverImage source={coverSource} style={styles.cover} />
         <Text style={styles.title}>{title}</Text>
 
         <View style={styles.progressWrap}>

@@ -31,7 +31,19 @@ export default function SearchResults({ results }: { results: any[] }) {
           title={item.title}
           url={item.url}
           coverUrl={item.coverUrl}
-          onPlay={() => playFromList(tracks, index, DEFAULT_COVER)}
+          onPlay={() => {
+            if (__DEV__) {
+              console.log("[SEARCH_RESULTS] onPlay", {
+                index,
+                title: item.title,
+                url: item.url ?? null,
+                hasUrl: !!item.url,
+                coverUrl: item.coverUrl ?? null,
+                hasCoverUrl: !!item.coverUrl,
+              });
+            }
+            playFromList(tracks, index, DEFAULT_COVER);
+          }}
         />
       )}
     />

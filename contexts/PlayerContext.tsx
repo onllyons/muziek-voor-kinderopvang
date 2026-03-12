@@ -159,6 +159,29 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     opts: { autoExpand?: boolean; repeatMode?: RepeatMode } = {}
   ) {
     log("[PLAY_FROM_LIST] startIndex=", startIndex, "inputLen=", list.length);
+    if (__DEV__) {
+      console.log("[PLAY_FROM_LIST] input", {
+        startIndex,
+        repeatMode: opts.repeatMode ?? RepeatMode.Queue,
+        selected: list[startIndex]
+          ? {
+              title: list[startIndex].title,
+              url: list[startIndex].url ?? null,
+              hasUrl: !!list[startIndex].url,
+              coverUrl: list[startIndex].coverUrl ?? null,
+              hasCoverUrl: !!list[startIndex].coverUrl,
+            }
+          : null,
+        items: list.map((item, index) => ({
+          index,
+          title: item.title,
+          url: item.url ?? null,
+          hasUrl: !!item.url,
+          coverUrl: item.coverUrl ?? null,
+          hasCoverUrl: !!item.coverUrl,
+        })),
+      });
+    }
 
     const valid = list.filter((t) => !!t.url);
     if (valid.length === 0) {
@@ -174,6 +197,19 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       coverUrl: it.coverUrl ?? fallbackCover,
     }));
     log("[PLAY_FROM_LIST] tracksLen=", tracks.length);
+    if (__DEV__) {
+      console.log("[PLAY_FROM_LIST] normalized tracks", {
+        fallbackCover,
+        tracks: tracks.map((track, index) => ({
+          index,
+          title: track.title,
+          audioUrl: track.audioUrl ?? null,
+          hasAudioUrl: !!track.audioUrl,
+          coverUrl: track.coverUrl ?? null,
+          hasCoverUrl: !!track.coverUrl,
+        })),
+      });
+    }
 
     setPlaylist(tracks);
     setCurrentIndex(startIndex);
@@ -205,6 +241,19 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
         log("[PLAY_FROM_LIST] queued & playing at index", startIndex);
       } catch (e) {
         console.warn("playFromList error:", e);
+        if (__DEV__) {
+          console.log("[PLAY_FROM_LIST] failure context", {
+            startIndex,
+            repeatMode,
+            selected: tracks[startIndex]
+              ? {
+                  title: tracks[startIndex].title,
+                  audioUrl: tracks[startIndex].audioUrl ?? null,
+                  coverUrl: tracks[startIndex].coverUrl ?? null,
+                }
+              : null,
+          });
+        }
         setIntends(false);
         suppressTrackChangeRef.current = false;
         desiredIndexRef.current = null;

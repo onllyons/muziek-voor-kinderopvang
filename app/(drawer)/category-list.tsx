@@ -53,8 +53,24 @@ export default function CategoryListScreen() {
     setError(null);
     try {
       const data = await runQ(() => fetchTracks());
+      if (__DEV__) {
+        console.log("[CATEGORY_LIST] loaded tracks", {
+          count: data.length,
+          tracks: data.map((track, index) => ({
+            index,
+            title: track.title,
+            url: track.url ?? null,
+            hasUrl: !!track.url,
+            coverUrl: track.coverUrl ?? null,
+            hasCoverUrl: !!track.coverUrl,
+          })),
+        });
+      }
       setTracks(data);
     } catch (e: any) {
+      console.warn("[CATEGORY_LIST] load error", {
+        message: e?.message ?? String(e),
+      });
       setError(e?.message ?? "Failed to load");
       setTracks([]);
     } finally {
@@ -125,7 +141,17 @@ export default function CategoryListScreen() {
             url={item.url}
             coverUrl={item.coverUrl}
             onOverflowPress={handleOverflowPress}
-            onPlay={() =>
+            onPlay={() => {
+              if (__DEV__) {
+                console.log("[CATEGORY_LIST] onPlay", {
+                  index,
+                  title: item.title,
+                  url: item.url ?? null,
+                  hasUrl: !!item.url,
+                  coverUrl: item.coverUrl ?? null,
+                  hasCoverUrl: !!item.coverUrl,
+                });
+              }
               playFromList(
                 tracks.map((t) => ({
                   title: t.title,
@@ -133,8 +159,8 @@ export default function CategoryListScreen() {
                   coverUrl: t.coverUrl,
                 })),
                 index
-              )
-            }
+              );
+            }}
           />
         )}
       />
