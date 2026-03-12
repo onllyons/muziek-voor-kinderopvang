@@ -7,7 +7,7 @@ import React, {
   ReactNode,
 } from "react";
 import { Alert } from "react-native";
-import TrackPlayer, { Event, State } from "react-native-track-player";
+import TrackPlayer, { Event, RepeatMode, State } from "react-native-track-player";
 import { DEFAULT_COVER } from "@/lib/queries";
 import {
   applyMaxVolume,
@@ -38,7 +38,7 @@ type PlayerContextType = {
     list: { title: string; url: string; coverUrl?: string | number }[],
     startIndex: number,
     coverUrl?: string | number,
-    opts?: { autoExpand?: boolean }
+    opts?: { autoExpand?: boolean; repeatMode?: RepeatMode }
   ) => Promise<void>;
   setCurrentTrack: (
     track: Track | null,
@@ -156,7 +156,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     list: { title: string; url: string; coverUrl?: string | number }[],
     startIndex: number,
     coverUrl?: string | number,
-    opts: { autoExpand?: boolean } = {}
+    opts: { autoExpand?: boolean; repeatMode?: RepeatMode } = {}
   ) {
     log("[PLAY_FROM_LIST] startIndex=", startIndex, "inputLen=", list.length);
 
@@ -183,6 +183,8 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     suppressTrackChangeRef.current = true;
     desiredIndexRef.current = startIndex;
 
+    const repeatMode = opts.repeatMode ?? RepeatMode.Queue;
+
     await withCmdLock(async () => {
       try {
         await TrackPlayer.reset();
@@ -195,6 +197,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
           }))
         );
         await TrackPlayer.skip(startIndex);
+        await TrackPlayer.setRepeatMode(repeatMode);
         await TrackPlayer.play();
         await applyMaxVolume();
         await showVolumeDebug("playFromList");
@@ -242,6 +245,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
           title: track.title,
           artwork: track.coverUrl as any,
         });
+        await TrackPlayer.setRepeatMode(RepeatMode.Off);
         await TrackPlayer.play();
         await applyMaxVolume();
         await showVolumeDebug("setCurrentTrack");

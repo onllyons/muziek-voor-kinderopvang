@@ -13,6 +13,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import BackHeader from "@/components/BackHeader";
 import { usePlayer } from "@/contexts/PlayerContext";
+import { RepeatMode } from "react-native-track-player";
 import TrackRow from "@/components/TrackRow";
 import { gqlFetch, edgesToArray } from "@/lib/gql";
 import { SONGS_BY_TAG_ID } from "@/lib/queries-graphql";
@@ -35,6 +36,9 @@ export default function SongsByTagScreen() {
     g2?: string;
     origin?: "themes" | "home";
   }>();
+  const isOvergang = String(name ?? "")
+    .trim()
+    .toLowerCase() === "overgang";
 
   const [tracks, setTracks] = React.useState<
     { title: string; url: string; coverUrl?: string | number }[]
@@ -157,7 +161,8 @@ export default function SongsByTagScreen() {
                   coverUrl: t.coverUrl,
                 })),
                 index,
-                DEFAULT_COVER
+                DEFAULT_COVER,
+                { repeatMode: isOvergang ? RepeatMode.Track : RepeatMode.Queue }
               )
             }
           />
