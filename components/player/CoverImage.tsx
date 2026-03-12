@@ -11,6 +11,8 @@ type Props = {
   style?: StyleProp<ImageStyle>;
 };
 
+const resolvedCoverCache = new Map<string, string>();
+
 function buildFallbackUris(uri: string) {
   const normalized = uri.trim();
   if (!normalized) return [];
@@ -34,36 +36,59 @@ export default function CoverImage({ source, style }: Props) {
     return typeof uri === "string" ? buildFallbackUris(uri) : [];
   }, [source]);
 
-  const [attemptIndex, setAttemptIndex] = React.useState(0);
+  const originalUri =
+    typeof source === "number" ? null : typeof source?.uri === "string" ? source.uri : null;
+
+  const resolveInitialUri = React.useCallback(() => {
+    const firstUri = fallbackUris[0] ?? originalUri ?? "";
+    if (!originalUri) return firstUri;
+    const cachedUri = resolvedCoverCache.get(originalUri);
+    if (cachedUri && fallbackUris.includes(cachedUri)) {
+      return cachedUri;
+    }
+    return firstUri;
+  }, [fallbackUris, originalUri]);
+
+  const [currentUri, setCurrentUri] = React.useState(resolveInitialUri);
 
   React.useEffect(() => {
-    setAttemptIndex(0);
-  }, [fallbackUris, source]);
+    setCurrentUri(resolveInitialUri());
+  }, [resolveInitialUri]);
 
   if (typeof source === "number") {
     return <Image source={source} style={style} />;
   }
 
-  const resolvedUri = fallbackUris[attemptIndex] ?? source?.uri;
   const resolvedSource =
-    typeof resolvedUri === "string" && resolvedUri
-      ? { ...source, uri: resolvedUri }
+    typeof currentUri === "string" && currentUri
+      ? { ...source, uri: currentUri }
       : source;
 
   return (
     <Image
       source={resolvedSource}
       style={style}
+      onLoad={() => {
+        if (!originalUri || !currentUri) return;
+        resolvedCoverCache.set(originalUri, currentUri);
+        if (__DEV__ && currentUri !== originalUri) {
+          console.log("[COVER_IMAGE] cache resolved", {
+            originalUri,
+            resolvedUri: currentUri,
+          });
+        }
+      }}
       onError={() => {
-        if (attemptIndex < fallbackUris.length - 1) {
-          const nextUri = fallbackUris[attemptIndex + 1];
+        const currentIndex = fallbackUris.indexOf(currentUri);
+        if (currentIndex >= 0 && currentIndex < fallbackUris.length - 1) {
+          const nextUri = fallbackUris[currentIndex + 1];
           if (__DEV__) {
             console.log("[COVER_IMAGE] fallback", {
-              from: fallbackUris[attemptIndex],
+              from: currentUri,
               to: nextUri,
             });
           }
-          setAttemptIndex((prev) => prev + 1);
+          setCurrentUri(nextUri);
         } else if (__DEV__) {
           console.log("[COVER_IMAGE] all fallbacks failed", {
             tried: fallbackUris,
