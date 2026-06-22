@@ -14,6 +14,9 @@
       "channel": "preview"
     },
     "production": {
+      "ios": {
+        "image": "macos-tahoe-26.4-xcode-26.4"
+      },
       "autoIncrement": true,
       "env": {
         "EXPO_PUBLIC_SUPABASE_URL": "https://ipkpczvxxlxalmoasodi.supabase.co",
